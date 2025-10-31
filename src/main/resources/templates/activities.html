@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Activities - SPOC Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="p-4">
+<div class="container">
+  <h2>Weekend Activities</h2>
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="showCreate()">Create Activity</button>
+  </div>
+
+  <table class="table table-bordered" id="activitiesTable">
+    <thead><tr><th>ID</th><th>Name</th><th>Date</th><th>CreatedBy</th><th>Action</th></tr></thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="createArea" style="display:none; margin-top:20px;">
+    <h4>Create Activity</h4>
+    <input id="actName" class="form-control mb-2" placeholder="CR name e.g. CR1312 - Linux Patching" />
+    <input id="actDate" type="date" class="form-control mb-2" />
+    <input id="actBy" class="form-control mb-2" placeholder="Created By" />
+    <button class="btn btn-success" onclick="createActivity()">Create</button>
+    <button class="btn btn-link" onclick="hideCreate()">Cancel</button>
+  </div>
+</div>
+
+<script>
+async function loadActivities(){
+  const res = await fetch('/api/activities');
+  const list = await res.json();
+  const tbody = document.querySelector('#activitiesTable tbody');
+  tbody.innerHTML = '';
+  list.forEach(a => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${a.id}</td><td>${a.name}</td><td>${a.activityDate||''}</td><td>${a.createdBy||''}</td><td><a href='/activities/${a.id}' class='btn btn-sm btn-info'>View</a></td>`;
+    tbody.appendChild(tr);
+  });
+}
+function showCreate(){document.getElementById('createArea').style.display='block';}
+function hideCreate(){document.getElementById('createArea').style.display='none';}
+async function createActivity(){
+  const payload = { name: document.getElementById('actName').value, activityDate: document.getElementById('actDate').value, createdBy: document.getElementById('actBy').value };
+  if(!payload.name){alert('Name required'); return}
+  await fetch('/api/activities',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  hideCreate(); loadActivities();
+}
+window.onload = loadActivities;
+</script>
+</body>
+</html>
