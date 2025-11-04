@@ -2,6 +2,10 @@ package com.example.spocportal.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class ActivityAssignment {
@@ -9,19 +13,37 @@ public class ActivityAssignment {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne
-	@JoinColumn(name = "activity_id")
+	// link to activity
+	@ManyToOne(fetch = FetchType.LAZY)
 	private Activity activity;
 
+	// link to spoc master (static group)
 	@ManyToOne
-	@JoinColumn(name = "spoc_id")
 	private SpocDetails spoc;
+	
 
-	private String status; // Pending / Confirmed / NACK
+
+	@Enumerated(EnumType.STRING)
+	private AssignmentStatus status = AssignmentStatus.PENDING;
+
+	// override fields for this particular CR (editable)
+	private String overridePrimaryName;
+	private String overridePrimaryEmail;
+	private String overridePrimaryContact;
+
+	private String overrideSecondaryName;
+	private String overrideSecondaryEmail;
+	private String overrideSecondaryContact;
+
+	@Column(length = 2000)
 	private String comments;
+
 	private LocalDateTime updatedAt = LocalDateTime.now();
 
-	// getters and setters
+	public ActivityAssignment() {
+	}
+
+	// getters/setters
 	public Long getId() {
 		return id;
 	}
@@ -46,12 +68,60 @@ public class ActivityAssignment {
 		this.spoc = spoc;
 	}
 
-	public String getStatus() {
+	public AssignmentStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(AssignmentStatus status) {
 		this.status = status;
+	}
+
+	public String getOverridePrimaryName() {
+		return overridePrimaryName;
+	}
+
+	public void setOverridePrimaryName(String overridePrimaryName) {
+		this.overridePrimaryName = overridePrimaryName;
+	}
+
+	public String getOverridePrimaryEmail() {
+		return overridePrimaryEmail;
+	}
+
+	public void setOverridePrimaryEmail(String overridePrimaryEmail) {
+		this.overridePrimaryEmail = overridePrimaryEmail;
+	}
+
+	public String getOverridePrimaryContact() {
+		return overridePrimaryContact;
+	}
+
+	public void setOverridePrimaryContact(String overridePrimaryContact) {
+		this.overridePrimaryContact = overridePrimaryContact;
+	}
+
+	public String getOverrideSecondaryName() {
+		return overrideSecondaryName;
+	}
+
+	public void setOverrideSecondaryName(String overrideSecondaryName) {
+		this.overrideSecondaryName = overrideSecondaryName;
+	}
+
+	public String getOverrideSecondaryEmail() {
+		return overrideSecondaryEmail;
+	}
+
+	public void setOverrideSecondaryEmail(String overrideSecondaryEmail) {
+		this.overrideSecondaryEmail = overrideSecondaryEmail;
+	}
+
+	public String getOverrideSecondaryContact() {
+		return overrideSecondaryContact;
+	}
+
+	public void setOverrideSecondaryContact(String overrideSecondaryContact) {
+		this.overrideSecondaryContact = overrideSecondaryContact;
 	}
 
 	public String getComments() {
@@ -68,5 +138,74 @@ public class ActivityAssignment {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	// helper getters to display (prefer override else spoc master)
+	@Transient
+//	public String getDisplayPrimaryName() {
+//		if (overridePrimaryName != null && !overridePrimaryName.isBlank())
+//			return overridePrimaryName;
+//		return spoc != null ? spoc.getPrimaryName() : "";
+//	}
+	public String getDisplayPrimaryName() {
+	    return overridePrimaryName != null ? overridePrimaryName : spoc.getPrimaryName();
+	}
+
+
+	@Transient
+	public String getDisplayPrimaryEmail() {
+		if (overridePrimaryEmail != null && !overridePrimaryEmail.isBlank())
+			return overridePrimaryEmail;
+		return spoc != null ? spoc.getPrimaryEmail() : "";
+	}
+
+	@Transient
+	public String getDisplayPrimaryContact() {
+		if (overridePrimaryContact != null && !overridePrimaryContact.isBlank())
+			return overridePrimaryContact;
+		return spoc != null ? spoc.getPrimaryContact() : "";
+	}
+	
+
+	@Transient
+	public String getDisplaySecondaryName() {
+		if (overrideSecondaryName != null && !overrideSecondaryName.isBlank())
+			return overrideSecondaryName;
+		return spoc != null ? spoc.getSecondaryName() : "";
+	}
+
+	@Transient
+	public String getDisplaySecondaryEmail() {
+		if (overrideSecondaryEmail != null && !overrideSecondaryEmail.isBlank())
+			return overrideSecondaryEmail;
+		return spoc != null ? spoc.getSecondaryEmail() : "";
+	}
+
+	@Transient
+	public String getDisplaySecondaryContact() {
+		if (overrideSecondaryContact != null && !overrideSecondaryContact.isBlank())
+			return overrideSecondaryContact;
+		return spoc != null ? spoc.getSecondaryContact() : "";
+	}
+
+	// aging simple: days left from activity implementation date
+	@Transient
+	public long getDaysDelta() {
+		if (activity == null || activity.getImplementationDate() == null)
+			return 0L;
+		LocalDate today = LocalDate.now();
+		return ChronoUnit.DAYS.between(today, activity.getImplementationDate());
+	}
+
+	@Transient
+	public String getAging() {
+		if (status != AssignmentStatus.PENDING)
+			return status.name();
+		long days = getDaysDelta();
+		if (days < 0)
+			return "RED";
+		if (days <= 3)
+			return "AMBER";
+		return "AMBER";
 	}
 }

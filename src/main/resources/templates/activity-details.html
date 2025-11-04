@@ -1,65 +1,116 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="utf-8" />
-<title>Activity Details - SPOC Portal</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<meta charset="UTF-8" />
+	<title>CR SPOC Assignment</title>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
-<body class="p-4">
-<div class="container">
-<a href="/activities" class="btn btn-link">Back to Activities</a>
-<h3 th:text="${activity.name}">Activity Name</h3>
-<p>Date: <span th:text="${activity.activityDate}"></span> | CreatedBy: <span th:text="${activity.createdBy}"></span></p>
 
+<body>
 
-<div id="summary" class="mb-3"></div>
+	<div th:replace="~{fragments/navbar :: fragment}"></div>
 
+	<div class="container mt-3">
 
-<table class="table table-bordered" id="assignTable">
-<thead><tr><th>Group</th><th>SPOC</th><th>Email</th><th>Contact</th><th>Comments</th><th>Status</th><th>Action</th></tr></thead>
-<tbody></tbody>
-</table>
-</div>
+		<a href="/dashboard" class="btn btn-link">&lt; Back</a>
 
+		<h3 th:text="${activity.crNumber + ' - ' + activity.name}"></h3>
+		<p>
+			Implementation: <span th:text="${activity.implementationDate}"></span> |
+			Created By: <span th:text="${activity.createdBy}"></span>
+		</p>
 
-<script>
-const activityId = location.pathname.split('/').pop();
-async function loadAssignments(){
-const res = await fetch('/api/activities/' + activityId + '/assignments');
-const list = await res.json();
-const tbody = document.querySelector('#assignTable tbody');
-tbody.innerHTML = '';
-let pending=0, confirmed=0, nack=0;
-list.forEach(a => {
-if(a.status==='Pending') pending++;
-if(a.status==='Confirmed') confirmed++;
-if(a.status==='NACK') nack++;
-const tr = document.createElement('tr');
-tr.innerHTML = `
-<td>${a.spoc.teamName}</td>
-<td>${a.spoc.spocName}</td>
-<td>${a.spoc.email}</td>
-<td>${a.spoc.contactNumber}</td>
-<td><input class='form-control' id='c_${a.id}' value='${a.comments||''}' /></td>
-<td>
-<select id='s_${a.id}' class='form-select'>
-<option ${a.status==='Pending'?'selected':''}>Pending</option>
-<option ${a.status==='Confirmed'?'selected':''}>Confirmed</option>
-<option ${a.status==='NACK'?'selected':''}>NACK</option>
-</select>
-</td>
-<td><button class='btn btn-sm btn-primary' onclick='save(${a.id})'>Save</button></td>
-`;
-tbody.appendChild(tr);
-});
-document.getElementById('summary').innerHTML = `Pending: ${pending} &nbsp; Confirmed: ${confirmed} &nbsp; NACK: ${nack}`;
-}
-async function save(id){
-const payload = { comments: document.getElementById('c_'+id).value, status: document.getElementById('s_'+id).value };
-await fetch('/api/assignments/' + id, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)});
-loadAssignments();
-}
-window.onload = loadAssignments;
-</script>
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th>Group</th>
+					<th>Primary Name</th>
+					<th>Primary Email</th>
+					<th>Primary Contact</th>
+					<th>Secondary Name</th>
+					<th>Secondary Email</th>
+					<th>Secondary Contact</th>
+					<th>Comments</th>
+					<th>Status</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr th:each="as : ${assignments}">
+					<td th:text="${as.spoc.teamName}"></td>
+
+					<td><input class="form-control" th:id="'pname_'+${as.id}" th:value="${as.displayPrimaryName}" />
+					</td>
+					<td><input class="form-control" th:id="'pemail_'+${as.id}" th:value="${as.displayPrimaryEmail}" />
+					</td>
+					<td><input class="form-control" th:id="'pcontact_'+${as.id}"
+							th:value="${as.displayPrimaryContact}" /></td>
+
+					<td><input class="form-control" th:id="'sname_'+${as.id}" th:value="${as.displaySecondaryName}" />
+					</td>
+					<td><input class="form-control" th:id="'semail_'+${as.id}" th:value="${as.displaySecondaryEmail}" />
+					</td>
+					<td><input class="form-control" th:id="'scontact_'+${as.id}"
+							th:value="${as.displaySecondaryContact}" /></td>
+
+					<td><input class="form-control" th:id="'c_'+${as.id}" th:value="${as.comments}" /></td>
+
+					<td>
+						<select class="form-select" th:id="'st_'+${as.id}">
+							<option th:selected="${as.status.name()=='PENDING'}" value="PENDING">PENDING</option>
+							<option th:selected="${as.status.name()=='RECEIVED'}" value="RECEIVED">RECEIVED</option>
+							<option th:selected="${as.status.name()=='NOT_REQUIRED'}" value="NOT_REQUIRED">NOT REQUIRED
+							</option>
+						</select>
+					</td>
+
+					<td>
+						<button class="btn btn-sm btn-success" th:data-id="${as.id}"
+							onclick="save(this.dataset.id)">Save</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+	<script>
+		const csrfToken = document.querySelector('meta[name=_csrf]').content;
+		const csrfHeader = document.querySelector('meta[name=_csrf_header]').content;
+
+		async function save(id) {
+			const payload = {
+				overridePrimaryName: document.getElementById("pname_" + id)?.value,
+				overridePrimaryEmail: document.getElementById("pemail_" + id)?.value,
+				overridePrimaryContact: document.getElementById("pcontact_" + id)?.value,
+				overrideSecondaryName: document.getElementById("sname_" + id)?.value,
+				overrideSecondaryEmail: document.getElementById("semail_" + id)?.value,
+				overrideSecondaryContact: document.getElementById("scontact_" + id)?.value,
+				comments: document.getElementById("c_" + id)?.value,
+				status: document.getElementById("st_" + id)?.value
+			};
+
+			const res = await fetch("/api/assignments/" + id, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					[csrfHeader]: csrfToken
+				},
+				body: JSON.stringify(payload)
+			});
+
+			if (res.ok) {
+				location.reload();
+			} else {
+				alert("Save failed " + res.status);
+			}
+		}
+	</script>
+
 </body>
+
 </html>
