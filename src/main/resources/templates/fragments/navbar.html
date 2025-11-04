@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<body>
+	<nav th:fragment="fragment">
+		<div class="bg-dark text-white p-2">
+			<div class="container d-flex align-items-center">
+				<div>
+					<a href="/dashboard" class="text-white me-3">Dashboard</a>
+					<a href="/activities" class="text-white me-3">Activities</a>
+					<a href="/spocs" class="text-white me-3">SPOC Master</a>
+					<a th:if="${#authorization.expression('hasRole(''ADMIN'')')}" href="/admin/activities/create"
+						class="text-white me-3">Create CR</a>
+				</div>
+				<div class="ms-auto">
+					<form th:action="@{/logout}" method="post" style="display:inline">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+						<button type="submit" class="btn btn-link text-white">Logout</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</nav>
+</body>
+
+</html>

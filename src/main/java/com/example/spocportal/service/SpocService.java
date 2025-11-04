@@ -10,31 +10,22 @@ import java.util.Optional;
 
 @Service
 public class SpocService {
+	private final SpocRepository repo;
 
-    private final SpocRepository repository;
+	public SpocService(SpocRepository repo) {
+		this.repo = repo;
+	}
 
-    public SpocService(SpocRepository repository) {
-        this.repository = repository;
-    }
+	public List<SpocDetails> findAll() {
+		return repo.findAll();
+	}
 
-    public List<SpocDetails> findAll() {
-        return repository.findAll();
-    }
+	public Optional<SpocDetails> findById(Long id) {
+		return repo.findById(id);
+	}
 
-    public Optional<SpocDetails> findById(Long id) {
-        return repository.findById(id);
-    }
-
-    public Optional<SpocDetails> findByTeam(String teamName) {
-        return repository.findByTeamNameIgnoreCase(teamName);
-    }
-
-    public SpocDetails save(SpocDetails spoc) {
-        spoc.setLastUpdatedTime(LocalDateTime.now());
-        return repository.save(spoc);
-    }
-
-    public void delete(Long id) {
-        repository.deleteById(id);
-    }
+	public SpocDetails save(SpocDetails s) {
+		s.setLastUpdatedTime(LocalDateTime.now());
+		return repo.save(s);
+	}
 }
