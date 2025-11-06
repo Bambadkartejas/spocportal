@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="utf-8" />
+	<title>Create CR</title>
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+	<style>
+		body {
+			background: #eef3f8;
+			font-family: "Poppins", sans-serif;
+		}
+
+		.page-header {
+			font-weight: 600;
+			color: #0d6efd;
+		}
+
+		.form-card {
+			background: white;
+			padding: 30px;
+			border-radius: 12px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+			border: 1px solid #eaeaea;
+			transition: 0.3s;
+		}
+
+		.form-card:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+		}
+
+		label {
+			font-weight: 500;
+			margin-bottom: 3px;
+		}
+
+		input:focus,
+		select:focus {
+			border-color: #0d6efd !important;
+			box-shadow: rgba(13, 110, 253, .25) 0px 0px 0px 4px !important;
+		}
+
+		.btn-create {
+			background: linear-gradient(45deg, #198754, #20c997);
+			border: none;
+			width: 100%;
+		}
+
+		.btn-create:hover {
+			opacity: 0.9;
+		}
+
+		.back-link {
+			text-decoration: none;
+			font-size: 14px;
+			margin-bottom: -10px;
+			display: inline-block;
+		}
+
+		.back-link:hover {
+			text-decoration: underline;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div th:replace="~{fragments/navbar :: fragment}"></div>
+
+	<div class="container mt-4">
+		<a href="/activities" class="back-link">⬅ Back to Activities</a>
+		<h3 class="page-header mt-2">Create New Change Request (CR)</h3>
+
+		<div class="form-card mt-3">
+			<div class="row">
+
+				<div class="col-md-6 mb-3">
+					<label>CR Number</label>
+					<input id="crNumber" class="form-control" placeholder="Ex: CR432" />
+				</div>
+
+				<div class="col-md-6 mb-3">
+					<label>CR Name</label>
+					<input id="name" class="form-control" placeholder="Short description" />
+				</div>
+
+				<div class="col-md-6 mb-3">
+					<label>Implementation Date</label>
+					<input id="implDate" type="date" class="form-control" />
+				</div>
+
+				<div class="col-md-3 mb-3">
+					<label>Start Time</label>
+					<input id="startTime" type="time" class="form-control" />
+				</div>
+
+				<div class="col-md-3 mb-3">
+					<label>End Time</label>
+					<input id="endTime" type="time" class="form-control" />
+				</div>
+
+				<div class="col-md-6 mb-3">
+					<label>Time Zone</label>
+					<select id="timeZone" class="form-select">
+						<option value="GMT" selected>GMT</option>
+						<option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
+						<option value="UTC">UTC</option>
+						<option value="Europe/London">Europe/London</option>
+						<option value="Asia/Singapore">Singapore</option>
+					</select>
+				</div>
+
+				<div class="col-md-6 mb-3">
+					<label>Created By</label>
+					<input id="createdBy" class="form-control" placeholder="Requester name" />
+				</div>
+
+				<div class="col-md-12 mb-3">
+					<label>CR Description</label>
+					<input id="description" class="form-control" placeholder="Brief description..." />
+				</div>
+
+				<div class="col-12">
+					<button class="btn btn-success btn-create mt-3" onclick="createCR()">
+						✅ Create CR
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		const csrfToken = document.querySelector('meta[name=_csrf]').getAttribute('content');
+		const csrfHeader = document.querySelector('meta[name=_csrf_header]').getAttribute('content');
+
+		function crossesMidnight(start, end) {
+			return end < start; // e.g. 23:00 > 03:00
+		}
+
+		async function createCR() {
+			const startTime = document.getElementById('startTime').value;
+			const endTime = document.getElementById('endTime').value;
+
+			const payload = {
+				crNumber: document.getElementById('crNumber').value,
+				name: document.getElementById('name').value,
+				implementationDate: document.getElementById('implDate').value,
+				startTime,
+				endTime,
+				timeZone: document.getElementById('timeZone').value,
+				description: document.getElementById('description').value,
+				createdBy: document.getElementById('createdBy').value,
+				crossesMidnight: crossesMidnight(startTime, endTime),
+
+			};
+
+
+
+			if (!payload.crNumber || !payload.name || !payload.implementationDate || !payload.createdBy) {
+				alert("❌ Please fill all fields.");
+				return;
+			}
+
+			const res = await fetch('/api/activities', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					[csrfHeader]: csrfToken
+				},
+				credentials: 'same-origin',
+				body: JSON.stringify(payload)
+			});
+
+			if (res.ok) {
+				alert("✅ CR Created Successfully!");
+				location.href = '/activities';
+			} else {
+				alert('Create failed.');
+			}
+		}
+	</script>
+
+</body>
+
+</html>

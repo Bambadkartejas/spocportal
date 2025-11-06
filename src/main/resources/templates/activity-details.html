@@ -21,6 +21,110 @@
 </table>
 </div>
 
+<<<<<<< Updated upstream
+=======
+		<h3 th:text="${activity.crNumber + ' - ' + activity.name}"></h3>
+		<p>
+			Implementation Date: <span th:text="${activity.implementationDate}"></span> |
+			Start Time: <span th:text="${activity.startTime}"></span> |
+			End Time: <span th:text="${activity.endTime}"></span> |
+			Created By: <span th:text="${activity.createdBy}"></span> 
+		</p>
+		<p>
+			CR Description:
+			<span th:text="${activity.crDescription != null ? activity.crDescription :
+		                    (activity.description != null ? activity.description : '--- No Description ---')}"></span>
+		</p>
+
+
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th>Group</th>
+					<th>Primary Name</th>
+					<th>Primary Email</th>
+					<th>Primary Contact</th>
+					<th>Secondary Name</th>
+					<th>Secondary Email</th>
+					<th>Secondary Contact</th>
+					<th>Comments</th>
+					<th>Status</th>
+					<th>Action</th>
+				</tr>
+			</thead>
+
+			<tbody>
+				<tr th:each="as : ${assignments}">
+					<td th:text="${as.spoc.teamName}"></td>
+
+					<td><input class="form-control" th:id="'pname_'+${as.id}" th:value="${as.displayPrimaryName}" />
+					</td>
+					<td><input class="form-control" th:id="'pemail_'+${as.id}" th:value="${as.displayPrimaryEmail}" />
+					</td>
+					<td><input class="form-control" th:id="'pcontact_'+${as.id}"
+							th:value="${as.displayPrimaryContact}" /></td>
+
+					<td><input class="form-control" th:id="'sname_'+${as.id}" th:value="${as.displaySecondaryName}" />
+					</td>
+					<td><input class="form-control" th:id="'semail_'+${as.id}" th:value="${as.displaySecondaryEmail}" />
+					</td>
+					<td><input class="form-control" th:id="'scontact_'+${as.id}"
+							th:value="${as.displaySecondaryContact}" /></td>
+
+					<td><input class="form-control" th:id="'c_'+${as.id}" th:value="${as.comments}" /></td>
+
+					<td>
+						<select class="form-select" th:id="'st_'+${as.id}">
+							<option th:selected="${as.status.name()=='PENDING'}" value="PENDING">PENDING</option>
+							<option th:selected="${as.status.name()=='RECEIVED'}" value="RECEIVED">RECEIVED</option>
+							<option th:selected="${as.status.name()=='NOT_REQUIRED'}" value="NOT_REQUIRED">NOT REQUIRED
+							</option>
+						</select>
+					</td>
+
+					<td>
+						<button class="btn btn-sm btn-success" th:data-id="${as.id}"
+							onclick="save(this.dataset.id)">Save</button>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+	</div>
+
+	<script>
+		const csrfToken = document.querySelector('meta[name=_csrf]').content;
+		const csrfHeader = document.querySelector('meta[name=_csrf_header]').content;
+
+		async function save(id) {
+			const payload = {
+				overridePrimaryName: document.getElementById("pname_" + id)?.value,
+				overridePrimaryEmail: document.getElementById("pemail_" + id)?.value,
+				overridePrimaryContact: document.getElementById("pcontact_" + id)?.value,
+				overrideSecondaryName: document.getElementById("sname_" + id)?.value,
+				overrideSecondaryEmail: document.getElementById("semail_" + id)?.value,
+				overrideSecondaryContact: document.getElementById("scontact_" + id)?.value,
+				comments: document.getElementById("c_" + id)?.value,
+				status: document.getElementById("st_" + id)?.value
+			};
+
+			const res = await fetch("/api/assignments/" + id, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					[csrfHeader]: csrfToken
+				},
+				body: JSON.stringify(payload)
+			});
+
+			if (res.ok) {
+				location.reload();
+			} else {
+				alert("Save failed " + res.status);
+			}
+		}
+	</script>
+>>>>>>> Stashed changes
 
 <script>
 const activityId = location.pathname.split('/').pop();
