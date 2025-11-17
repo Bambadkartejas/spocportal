@@ -1,164 +1,114 @@
 package com.example.spocportal.service;
 
-<<<<<<< Updated upstream
-import com.example.spocportal.model.Activity;
-import com.example.spocportal.model.ActivityAssignment;
-import com.example.spocportal.model.SpocDetails;
+import com.example.spocportal.model.*;
 import com.example.spocportal.repository.ActivityAssignmentRepository;
 import com.example.spocportal.repository.ActivityRepository;
 import com.example.spocportal.repository.SpocRepository;
-=======
-import com.example.spocportal.model.*;
-import com.example.spocportal.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
->>>>>>> Stashed changes
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
 public class ActivityService {
-<<<<<<< Updated upstream
-    private final ActivityRepository activityRepository;
-    private final SpocRepository spocRepository;
-    private final ActivityAssignmentRepository assignmentRepository;
-=======
 
-	private final ActivityRepository activityRepo;
-	private final SpocRepository spocRepo;
-	private final ActivityAssignmentRepository assignRepo;
->>>>>>> Stashed changes
+	private final ActivityRepository activityRepository;
+	private final SpocRepository spocRepository;
+	private final ActivityAssignmentRepository assignmentRepository;
+	private final EmailService emailService;
 
-    public ActivityService(ActivityRepository activityRepository, SpocRepository spocRepository, ActivityAssignmentRepository assignmentRepository) {
-        this.activityRepository = activityRepository;
-        this.spocRepository = spocRepository;
-        this.assignmentRepository = assignmentRepository;
-    }
-
-    public List<Activity> listAll() { return activityRepository.findAll(); }
-
-<<<<<<< Updated upstream
-    public Activity get(Long id) { return activityRepository.findById(id).orElse(null); }
-=======
-	public List<Activity> getAllActivities() {
-		return activityRepository.findAll();
+	public ActivityService(ActivityRepository activityRepository, SpocRepository spocRepository,
+			ActivityAssignmentRepository assignmentRepository, EmailService emailService) {
+		this.activityRepository = activityRepository;
+		this.spocRepository = spocRepository;
+		this.assignmentRepository = assignmentRepository;
+		this.emailService = emailService;
 	}
 
 	public List<Activity> listAll() {
-		return activityRepo.findAll();
+		return activityRepository.findAll();
 	}
->>>>>>> Stashed changes
 
-    @Transactional
-    public Activity create(Activity activity) {
-        // save activity first
-        Activity saved = activityRepository.save(activity);
+	public Activity get(Long id) {
+		return activityRepository.findById(id).orElse(null);
+	}
 
-        // auto-populate assignments for every SPOC in master
-        List<SpocDetails> spocs = spocRepository.findAll();
-        for (SpocDetails s : spocs) {
-            ActivityAssignment a = new ActivityAssignment();
-            a.setActivity(saved);
-            a.setSpoc(s);
-            a.setStatus("Pending");
-            a.setComments("");
-            assignmentRepository.save(a);
-            saved.getAssignments().add(a);
-        }
-        return saved;
-    }
-
-<<<<<<< Updated upstream
-    public List<ActivityAssignment> getAssignments(Long activityId) { return assignmentRepository.findByActivityId(activityId); }
-
-    public ActivityAssignment updateAssignment(Long id, ActivityAssignment update) {
-        return assignmentRepository.findById(id).map(existing -> {
-            existing.setStatus(update.getStatus());
-            existing.setComments(update.getComments());
-            existing.setUpdatedAt(java.time.LocalDateTime.now());
-            return assignmentRepository.save(existing);
-        }).orElse(null);
-    }
-=======
 	@Transactional
-	public Activity create(Activity a) {
-		a.evaluateCrossMidnight(); // ✅ Perform logic here
-		Activity saved = activityRepo.save(a);
+	public Activity create(Activity activity, String[] groupEmails) {
+		Activity saved = activityRepository.save(activity);
 
-		List<SpocDetails> spocs = spocRepo.findAll();
+		// create assignment for each SPOC in master
+		List<SpocDetails> spocs = spocRepository.findAll();
 		for (SpocDetails s : spocs) {
-			ActivityAssignment asg = new ActivityAssignment();
-			asg.setActivity(saved);
-			asg.setSpoc(s);
-			asg.setStatus(AssignmentStatus.PENDING);
-			assignRepo.save(asg);
+			ActivityAssignment a = new ActivityAssignment();
+			a.setActivity(saved);
+			a.setSpoc(s);
+			a.setStatus(AssignmentStatus.PENDING);
+			a.setComments(null);
+			a.setUpdatedAt(LocalDateTime.now());
+			a.setReminderCount(0);
+			assignmentRepository.save(a);
+			saved.getAssignments().add(a);
+		}
 
-			saved.getAssignments().add(asg);
+		// send initial notification to provided groupEmails
+		if (groupEmails != null && groupEmails.length > 0) {
+			emailService.sendNotificationForNewActivity(saved, groupEmails);
 		}
 		return saved;
 	}
 
-	public Activity updateActivityStatus(Long id, ActivityStatus status) {
-		return activityRepository.findById(id).map(a -> {
-			a.setActivityStatus(status);
-			return activityRepository.save(a);
-		}).orElse(null);
-	}
-
-	public void refreshStatus(Activity activity) {
-		if (activity.getImplementationDate() != null && (activity.getImplementationDate().isBefore(LocalDate.now())
-				|| activity.getImplementationDate().isEqual(LocalDate.now()))) {
-
-			if (activity.getActivityStatus() == ActivityStatus.PENDING) {
-				activity.setActivityStatus(ActivityStatus.STARTED);
-			}
-		}
-	}
-
 	public List<ActivityAssignment> getAssignments(Long activityId) {
-		return assignRepo.findByActivityId(activityId);
+		return assignmentRepository.findByActivityId(activityId);
 	}
 
-	@Transactional
-	public ActivityAssignment updateAssignment(Long id, ActivityAssignment payload) {
-		return assignRepo.findById(id).map(existing -> {
-			existing.setOverridePrimaryName(payload.getOverridePrimaryName());
-			existing.setOverridePrimaryEmail(payload.getOverridePrimaryEmail());
-			existing.setOverridePrimaryContact(payload.getOverridePrimaryContact());
-			existing.setOverrideSecondaryName(payload.getOverrideSecondaryName());
-			existing.setOverrideSecondaryEmail(payload.getOverrideSecondaryEmail());
-			existing.setOverrideSecondaryContact(payload.getOverrideSecondaryContact());
-
-			if (payload.getComments() != null)
-				existing.setComments(payload.getComments());
-			if (payload.getStatus() != null)
-				existing.setStatus(payload.getStatus());
-
-			existing.setUpdatedAt(java.time.LocalDateTime.now());
-
-			ActivityAssignment saved = assignRepo.save(existing);
-			checkAndAutoCompleteActivity(existing.getActivity());
-			return saved;
+	public ActivityAssignment updateAssignment(Long id, ActivityAssignment update) {
+		return assignmentRepository.findById(id).map(existing -> {
+			existing.setStatus(update.getStatus());
+			existing.setComments(update.getComments());
+			existing.setUpdatedAt(LocalDateTime.now());
+			return assignmentRepository.save(existing);
 		}).orElse(null);
 	}
 
-	private void checkAndAutoCompleteActivity(Activity activity) {
-		List<ActivityAssignment> assigns = assignRepo.findByActivity(activity);
+	public List<ActivityAssignment> getPendingAssignments() {
+		return assignmentRepository.findByStatus(AssignmentStatus.PENDING);
+	}
 
-		boolean allDone = assigns.stream().allMatch(
-				a -> a.getStatus() == AssignmentStatus.RECEIVED || a.getStatus() == AssignmentStatus.COMPLETED);
-
-		if (allDone && !Boolean.TRUE.equals(activity.getManualCompleted())) {
-			activity.setManualCompleted(true);
-			activityRepo.save(activity);
-		}
+	public Activity updateActivityStatus(Long id, ActivityStatus status) {
+		Activity a = activityRepository.findById(id).orElse(null);
+		if (a == null)
+			return null;
+		a.setActivityStatus(status);
+		return activityRepository.save(a);
 	}
 
 	public void deleteActivity(Long id) {
-		activityRepo.deleteById(id);
+		activityRepository.deleteById(id);
 	}
 
->>>>>>> Stashed changes
+	// helper for scheduler - increments reminders and returns days left or elapsed
+	public long daysUntilImplementation(ActivityAssignment assignment) {
+		LocalDate impl = assignment.getActivity().getImplementationDate();
+		if (impl == null)
+			return Long.MAX_VALUE;
+		return ChronoUnit.DAYS.between(LocalDate.now(), impl); // negative if past
+	}
+
+	public void markReminderSent(ActivityAssignment assignment) {
+		assignment.setReminderCount((assignment.getReminderCount() == null ? 0 : assignment.getReminderCount()) + 1);
+		assignment.setLastReminderAt(LocalDateTime.now());
+		assignmentRepository.save(assignment);
+	}
+
+	public List<Activity> getAllActivities() {
+		return activityRepository.findAll();
+	}
+
+	public boolean crNumberExists(String cr) {
+		return activityRepository.existsByCrNumber(cr);
+	}
 }
