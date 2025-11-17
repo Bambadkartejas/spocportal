@@ -11,62 +11,38 @@ import java.util.List;
 
 @Controller
 public class SpocController {
+	private final SpocService service;
 
-    private final SpocService service;
+	public SpocController(SpocService service) {
+		this.service = service;
+	}
 
-    public SpocController(SpocService service) {
-        this.service = service;
-    }
+	@GetMapping("/spocs")
+	public String spocMaster(Model model) {
+		List<SpocDetails> list = service.findAll();
+		model.addAttribute("spocs", list);
+		return "spocs";
+	}
 
-    // serve UI
-    @GetMapping({"/", "/spocs"})
-    public String index(Model model) {
-        List<SpocDetails> list = service.findAll();
-        model.addAttribute("spocs", list);
-        return "index"; // thymeleaf template
-    }
+	@GetMapping("/api/spocs")
+	@ResponseBody
+	public List<SpocDetails> apiGetAll() {
+		return service.findAll();
+	}
 
-    // REST endpoints
-    @GetMapping("/api/spocs")
-    @ResponseBody
-    public List<SpocDetails> getAll() {
-        return service.findAll();
-    }
-
-    @GetMapping("/api/spocs/{team}")
-    @ResponseBody
-    public ResponseEntity<SpocDetails> getByTeam(@PathVariable String team) {
-        return service.findByTeam(team)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping("/api/spocs")
-    @ResponseBody
-    public ResponseEntity<SpocDetails> create(@RequestBody SpocDetails spoc) {
-        SpocDetails saved = service.save(spoc);
-        return ResponseEntity.ok(saved);
-    }
-
-    @PutMapping("/api/spocs/{id}")
-    @ResponseBody
-    public ResponseEntity<SpocDetails> update(@PathVariable Long id, @RequestBody SpocDetails spoc) {
-        return service.findById(id).map(existing -> {
-            existing.setTeamName(spoc.getTeamName());
-            existing.setSpocName(spoc.getSpocName());
-            existing.setEmail(spoc.getEmail());
-            existing.setContactNumber(spoc.getContactNumber());
-            existing.setBackupName(spoc.getBackupName());
-            existing.setLastUpdatedBy(spoc.getLastUpdatedBy());
-            SpocDetails updated = service.save(existing);
-            return ResponseEntity.ok(updated);
-        }).orElse(ResponseEntity.notFound().build());
-    }
-
-    @DeleteMapping("/api/spocs/{id}")
-    @ResponseBody
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
+	@PutMapping("/api/spocs/{id}")
+	@ResponseBody
+	public ResponseEntity<SpocDetails> update(@PathVariable Long id, @RequestBody SpocDetails payload) {
+		return service.findById(id).map(existing -> {
+			existing.setPrimaryName(payload.getPrimaryName());
+			existing.setPrimaryEmail(payload.getPrimaryEmail());
+			existing.setPrimaryContact(payload.getPrimaryContact());
+			existing.setSecondaryName(payload.getSecondaryName());
+			existing.setSecondaryEmail(payload.getSecondaryEmail());
+			existing.setSecondaryContact(payload.getSecondaryContact());
+			existing.setLastUpdatedBy(payload.getLastUpdatedBy());
+			SpocDetails saved = service.save(existing);
+			return ResponseEntity.ok(saved);
+		}).orElse(ResponseEntity.notFound().build());
+	}
 }
