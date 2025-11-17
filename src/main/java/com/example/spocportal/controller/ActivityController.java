@@ -4,8 +4,6 @@ import com.example.spocportal.model.Activity;
 import com.example.spocportal.model.ActivityAssignment;
 import com.example.spocportal.model.ActivityStatus;
 import com.example.spocportal.service.ActivityService;
-<<<<<<< Updated upstream
-=======
 
 import org.apache.poi.xssf.usermodel.*;
 import org.apache.poi.ss.usermodel.Row;
@@ -14,8 +12,10 @@ import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
->>>>>>> Stashed changes
+import org.springframework.core.env.Environment;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,61 +23,65 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ActivityController {
-<<<<<<< Updated upstream
-    private final ActivityService activityService;
-=======
 
 	private final ActivityService service;
+	
+	@Autowired
+    private Environment env; 
 
 	@Autowired
 	private ActivityService activityService;
->>>>>>> Stashed changes
 
-    public ActivityController(ActivityService activityService) { this.activityService = activityService; }
+	public ActivityController(ActivityService service) {
+		this.service = service;
+	}
 
-    // UI pages
-    @GetMapping("/activities")
-    public String activitiesPage(Model model) {
-        model.addAttribute("activities", activityService.listAll());
-        return "activities";
-    }
+	@GetMapping("/activities")
+	public String activitiesPage(Model model) {
+		model.addAttribute("activities", service.listAll());
+		return "activities";
+	}
 
-    @GetMapping("/activities/{id}")
-    public String activityDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("activity", activityService.get(id));
-        model.addAttribute("assignments", activityService.getAssignments(id));
-        return "activity-details";
-    }
+	@GetMapping("/admin/activities/create")
+	public String createPage() {
+		return "activity-create";
+	}
 
-    // REST
-    @GetMapping("/api/activities")
-    @ResponseBody
-    public List<Activity> list() { return activityService.listAll(); }
+//	@PostMapping("/api/activities")
+//	@ResponseBody
+//	public ResponseEntity<?> create(@RequestBody Activity payload) {
+//		if (payload.getImplementationDate() == null)
+//			payload.setImplementationDate(LocalDate.now());
+//		if (payload.getCrNumber() == null || payload.getCrNumber().isBlank())
+//			return ResponseEntity.badRequest().body("CR Number required");
+//		if (service.crNumberExists(payload.getCrNumber()))
+//			return ResponseEntity.badRequest().body("CR Number already exists");
+//		Activity created = service.create(payload);
+//		return ResponseEntity.ok(created);
+//	}
+	
+	@PostMapping("/api/activities")
+	@ResponseBody
+	public ResponseEntity<?> create(@RequestBody Activity payload) {
+	    if (payload.getImplementationDate() == null)
+	        payload.setImplementationDate(LocalDate.now());
+	    if (payload.getCrNumber() == null || payload.getCrNumber().isBlank())
+	        return ResponseEntity.badRequest().body("CR Number required");
+	    if (service.crNumberExists(payload.getCrNumber()))
+	        return ResponseEntity.badRequest().body("CR Number already exists");
 
-<<<<<<< Updated upstream
-    @PostMapping("/api/activities")
-    @ResponseBody
-    public ResponseEntity<Activity> create(@RequestBody Activity payload) {
-        if (payload.getActivityDate() == null) payload.setActivityDate(LocalDate.now());
-        Activity created = activityService.create(payload);
-        return ResponseEntity.ok(created);
-    }
+	    String groupCsv = env.getProperty("spring.mail.group.emails", "");
+	    String[] groupEmails = groupCsv.isBlank() ? new String[0] : groupCsv.split("\\s*,\\s*");
 
-    @GetMapping("/api/activities/{id}/assignments")
-    @ResponseBody
-    public List<ActivityAssignment> assignments(@PathVariable Long id) { return activityService.getAssignments(id); }
+	    Activity created = service.create(payload, groupEmails);
+	    return ResponseEntity.ok(created);
+	}
 
-    @PutMapping("/api/assignments/{id}")
-    @ResponseBody
-    public ResponseEntity<ActivityAssignment> updateAssignment(@PathVariable Long id, @RequestBody ActivityAssignment payload) {
-        ActivityAssignment updated = activityService.updateAssignment(id, payload);
-        if (updated == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(updated);
-    }
-=======
+
 	@GetMapping("/activities/{id}")
 	public String details(@PathVariable Long id, Model model) {
 		Activity a = service.get(id);
@@ -104,6 +108,21 @@ public class ActivityController {
 			return ResponseEntity.status(500).body("Server error: " + ex.getMessage());
 		}
 	}
+	
+	@Autowired
+	private JavaMailSender mailSender;
+
+	@GetMapping("/test-mail")
+	public String sendTestMail() {
+	    SimpleMailMessage msg = new SimpleMailMessage();
+	    msg.setTo("tejasbmabadkar@gmail.com");
+	    msg.setSubject("Test Mail");
+	    msg.setText("Hello! This is a Spring Boot local test email.");
+
+	    mailSender.send(msg);
+	    return "Mail Sent!";
+	}
+
 
 	@GetMapping("/api/activities/{id}/assignments")
 	@ResponseBody
@@ -168,5 +187,4 @@ public class ActivityController {
 		outputStream.close();
 	}
 
->>>>>>> Stashed changes
 }

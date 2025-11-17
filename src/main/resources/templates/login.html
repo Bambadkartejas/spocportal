@@ -16,7 +16,6 @@
 			box-sizing: border-box;
 		}
 
-		/* ✅ Make footer stick bottom always */
 		body {
 			background-color: #080710;
 			font-family: 'Poppins', sans-serif;
@@ -54,7 +53,7 @@
 		}
 
 		form {
-			height: 520px;
+			height: auto;
 			width: 400px;
 			background-color: rgba(255, 255, 255, 0.13);
 			position: absolute;
@@ -68,14 +67,10 @@
 			padding: 50px 35px;
 		}
 
-		form * {
-			color: #ffffff;
-			border: none;
-		}
-
 		form h3 {
-			font-size: 32px;
-			font-weight: 500;
+			color: #fff;
+			font-size: 30px;
+			font-weight: 600;
 			text-align: center;
 		}
 
@@ -83,6 +78,7 @@
 			display: block;
 			margin-top: 30px;
 			font-size: 16px;
+			color: white;
 		}
 
 		input {
@@ -116,7 +112,33 @@
 			font-size: 14px;
 		}
 
-		/* ✅ Footer styling */
+		/* ❤️ Credential Box */
+		.cred-box {
+			background: rgba(255,255,255,0.12);
+			color: #fff;
+			margin-top: 25px;
+			padding: 15px;
+			border-radius: 8px;
+			border: 1px solid rgba(255,255,255,0.25);
+			font-size: 14px;
+		}
+
+		.cred-box h4 {
+			margin-bottom: 10px;
+			font-size: 16px;
+		}
+
+		.cred-item {
+			margin-bottom: 8px;
+			padding: 8px;
+			background: rgba(255,255,255,0.1);
+			border-radius: 6px;
+		}
+
+		.cred-item span {
+			font-weight: 600;
+		}
+
 		footer {
 			margin-top: auto;
 			padding: 10px;
@@ -125,16 +147,11 @@
 			font-size: 14px;
 			color: #555;
 			border-top: 1px solid #eee;
-			z-index: 9999;
 		}
 
 		footer a {
 			color: #1845ad;
 			text-decoration: none;
-		}
-
-		footer a:hover {
-			text-decoration: underline;
 		}
 	</style>
 </head>
@@ -146,35 +163,44 @@
 		<div class="shape"></div>
 	</div>
 
-	<!-- ✅ Spring Security login form -->
 	<form th:action="@{/login}" method="post">
 
 		<h3>SPOC Portal Login</h3>
 
-		<!-- error message -->
+		<!-- 🔴 Login Error -->
 		<div th:if="${param.error}" class="alert">
 			Invalid username or password!
 		</div>
 
-		<!-- username -->
 		<label for="username">Username</label>
 		<input type="text" name="username" id="username" placeholder="Enter Username" required>
 
-		<!-- password -->
 		<label for="password">Password</label>
 		<input type="password" name="password" id="password" placeholder="Enter Password" required>
 
 		<button type="submit">Login</button>
+
+		<!-- ⭐ Default Credentials Box -->
+		<div class="cred-box">
+			<h4>🔐 Default Login Credentials</h4>
+
+			<div class="cred-item">
+				<span>Admin ID:</span> admin / Admin@2714
+			</div>
+
+			<div class="cred-item">
+				<span>User ID:</span> user / User@2714
+			</div>
+		</div>
+
 	</form>
 
-	<!-- ✅ Footer now correctly placed at bottom -->
 	<footer>
-		© 2025 @TKS. All rights reserved. |
-		<a href="#">Privacy Policy</a> |
-		<a href="#">Terms of Use</a> |
-		<a href="#">Contact Us</a>
+		© 2025 @TKS | All rights reserved.
+		<!--<a href="#">Privacy Policy</a> |
+		<a href="#">Terms</a> |
+		<a href="#">Contact Us</a>-->
 	</footer>
 
 </body>
-
 </html>
