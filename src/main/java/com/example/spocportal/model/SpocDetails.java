@@ -6,87 +6,108 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "spoc_details")
 public class SpocDetails {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Column(nullable = false, unique = true)
+	private String teamName; // static group name
 
-    @Column(nullable = false)
-    private String teamName;
+	// primary
+	private String primaryName;
+	private String primaryEmail;
+	private String primaryContact;
 
-    private String spocName;
-    private String email;
-    private String contactNumber;
-    private String backupName;
-    private String lastUpdatedBy;
-    private LocalDateTime lastUpdatedTime;
+	// secondary
+	private String secondaryName;
+	private String secondaryEmail;
+	private String secondaryContact;
 
-    public SpocDetails() {
-    }
+	private String lastUpdatedBy;
+	private LocalDateTime lastUpdatedTime;
 
-    // getters and setters
+	public SpocDetails() {
+	}
 
-    public Long getId() {
-        return id;
-    }
+	// getters/setters...
+	// (include all getters and setters below)
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getTeamName() {
-        return teamName;
-    }
+	public String getTeamName() {
+		return teamName;
+	}
 
-    public void setTeamName(String teamName) {
-        this.teamName = teamName;
-    }
+	public void setTeamName(String teamName) {
+		this.teamName = teamName;
+	}
 
-    public String getSpocName() {
-        return spocName;
-    }
+	public String getPrimaryName() {
+		return primaryName;
+	}
 
-    public void setSpocName(String spocName) {
-        this.spocName = spocName;
-    }
+	public void setPrimaryName(String primaryName) {
+		this.primaryName = primaryName;
+	}
 
-    public String getEmail() {
-        return email;
-    }
+	public String getPrimaryEmail() {
+		return primaryEmail;
+	}
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+	public void setPrimaryEmail(String primaryEmail) {
+		this.primaryEmail = primaryEmail;
+	}
 
-    public String getContactNumber() {
-        return contactNumber;
-    }
+	public String getPrimaryContact() {
+		return primaryContact;
+	}
 
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
+	public void setPrimaryContact(String primaryContact) {
+		this.primaryContact = primaryContact;
+	}
 
-    public String getBackupName() {
-        return backupName;
-    }
+	public String getSecondaryName() {
+		return secondaryName;
+	}
 
-    public void setBackupName(String backupName) {
-        this.backupName = backupName;
-    }
+	public void setSecondaryName(String secondaryName) {
+		this.secondaryName = secondaryName;
+	}
 
-    public String getLastUpdatedBy() {
-        return lastUpdatedBy;
-    }
+	public String getSecondaryEmail() {
+		return secondaryEmail;
+	}
 
-    public void setLastUpdatedBy(String lastUpdatedBy) {
-        this.lastUpdatedBy = lastUpdatedBy;
-    }
+	public void setSecondaryEmail(String secondaryEmail) {
+		this.secondaryEmail = secondaryEmail;
+	}
 
-    public LocalDateTime getLastUpdatedTime() {
-        return lastUpdatedTime;
-    }
+	public String getSecondaryContact() {
+		return secondaryContact;
+	}
 
-    public void setLastUpdatedTime(LocalDateTime lastUpdatedTime) {
-        this.lastUpdatedTime = lastUpdatedTime;
-    }
+	public void setSecondaryContact(String secondaryContact) {
+		this.secondaryContact = secondaryContact;
+	}
+
+	public String getLastUpdatedBy() {
+		return lastUpdatedBy;
+	}
+
+	public void setLastUpdatedBy(String lastUpdatedBy) {
+		this.lastUpdatedBy = lastUpdatedBy;
+	}
+
+	public LocalDateTime getLastUpdatedTime() {
+		return lastUpdatedTime;
+	}
+
+	public void setLastUpdatedTime(LocalDateTime lastUpdatedTime) {
+		this.lastUpdatedTime = lastUpdatedTime;
+	}
 }

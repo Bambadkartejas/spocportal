@@ -1,13 +1,10 @@
 package com.example.spocportal.repository;
 
 import com.example.spocportal.model.Activity;
-<<<<<<< Updated upstream
-import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface ActivityRepository extends JpaRepository<Activity, Long> {
-=======
 import com.example.spocportal.model.ActivityStatus;
 
+import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +17,11 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     long countByActivityStatus(ActivityStatus status);
 
     Page<Activity> findByActivityStatus(ActivityStatus status, Pageable pageable);
->>>>>>> Stashed changes
+    
+
+    // find activities which are not COMPLETED (useful to limit reminders)
+    List<Activity> findByActivityStatusNot(ActivityStatus status);
+    
+    List<Activity> findByImplementationDateBetween(LocalDate from, LocalDate to);
 }
 
