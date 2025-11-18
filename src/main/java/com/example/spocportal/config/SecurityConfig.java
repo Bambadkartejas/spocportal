@@ -27,39 +27,39 @@ public class SecurityConfig {
 		return new InMemoryUserDetailsManager(admin, user);
 	}
 
-//	@Bean
-//	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-//		http.authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll()
-//				.requestMatchers("/css/**", "/js/**", "/login").permitAll().requestMatchers("/admin/**")
-//				
-//				.hasRole("ADMIN").requestMatchers("/api/activities").hasRole("ADMIN")
-//				.requestMatchers("/api/activities/**").hasAnyRole("ADMIN", "USER")
-//				.requestMatchers("/api/assignments/**").hasAnyRole("ADMIN", "USER")
-//				.requestMatchers("/spocs", "/activities", "/dashboard", "/").hasAnyRole("ADMIN", "USER").anyRequest()
-//				.authenticated())
-//				.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/dashboard", true).permitAll())
-//				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout").permitAll())
-//				.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
-//				.headers(headers -> headers.frameOptions().disable());
-//		return http.build();
-//	}
-
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http.authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll()
-				.requestMatchers("/css/**", "/js/**", "/login", "/login/**").permitAll().requestMatchers("/admin/**")
+				.requestMatchers("/css/**", "/js/**", "/login").permitAll().requestMatchers("/admin/**")
+				
 				.hasRole("ADMIN").requestMatchers("/api/activities").hasRole("ADMIN")
 				.requestMatchers("/api/activities/**").hasAnyRole("ADMIN", "USER")
 				.requestMatchers("/api/assignments/**").hasAnyRole("ADMIN", "USER")
 				.requestMatchers("/spocs", "/activities", "/dashboard", "/").hasAnyRole("ADMIN", "USER").anyRequest()
 				.authenticated())
-				.formLogin(form -> form.loginPage("/login").loginProcessingUrl("/login")
-						.defaultSuccessUrl("/dashboard", true).permitAll())
+				.formLogin(form -> form.loginPage("/login").defaultSuccessUrl("/dashboard", true).permitAll())
 				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout").permitAll())
-				.csrf(csrf -> csrf.disable()).headers(headers -> headers.frameOptions().disable());
-
+				.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+				.headers(headers -> headers.frameOptions().disable());
 		return http.build();
-
 	}
+
+//	@Bean
+//	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//		http.authorizeHttpRequests(auth -> auth.requestMatchers("/h2-console/**").permitAll()
+//				.requestMatchers("/css/**", "/js/**", "/login", "/login/**").permitAll().requestMatchers("/admin/**")
+//				.hasRole("ADMIN").requestMatchers("/api/activities").hasRole("ADMIN")
+//				.requestMatchers("/api/activities/**").hasAnyRole("ADMIN", "USER")
+//				.requestMatchers("/api/assignments/**").hasAnyRole("ADMIN", "USER")
+//				.requestMatchers("/spocs", "/activities", "/dashboard", "/").hasAnyRole("ADMIN", "USER").anyRequest()
+//				.authenticated())
+//				.formLogin(form -> form.loginPage("/login").loginProcessingUrl("/login")
+//						.defaultSuccessUrl("/dashboard", true).permitAll())
+//				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessUrl("/login?logout").permitAll())
+//				.csrf(csrf -> csrf.disable()).headers(headers -> headers.frameOptions().disable());
+//
+//		return http.build();
+//
+//	}
 
 }

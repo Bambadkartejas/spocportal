@@ -29,18 +29,32 @@
 					<th>Action</th>
 				</tr>
 			</thead>
-			<tbody></tbody>
+			<tbody>
+				<!-- rows inserted by script -->
+			</tbody>
 		</table>
 
-		<!-- Form area -->
+		<!-- form modal (simple) -->
 		<div id="formArea" style="display:none; margin-top:20px;">
 			<h4 id="formTitle">Add / Update SPOC</h4>
-			<div class="mb-2"><input id="teamName" class="form-control" placeholder="Team name (e.g., Unix)" /></div>
-			<div class="mb-2"><input id="spocName" class="form-control" placeholder="SPOC full name" /></div>
-			<div class="mb-2"><input id="email" class="form-control" placeholder="Email" /></div>
-			<div class="mb-2"><input id="contact" class="form-control" placeholder="Contact number" /></div>
-			<div class="mb-2"><input id="backup" class="form-control" placeholder="Backup SPOC" /></div>
-			<div class="mb-2"><input id="updatedBy" class="form-control" placeholder="Your name" /></div>
+			<div class="mb-2">
+				<input id="teamName" class="form-control" placeholder="Team name (e.g., Unix)" />
+			</div>
+			<div class="mb-2">
+				<input id="spocName" class="form-control" placeholder="SPOC full name" />
+			</div>
+			<div class="mb-2">
+				<input id="email" class="form-control" placeholder="Email" />
+			</div>
+			<div class="mb-2">
+				<input id="contact" class="form-control" placeholder="Contact number" />
+			</div>
+			<div class="mb-2">
+				<input id="backup" class="form-control" placeholder="Backup SPOC" />
+			</div>
+			<div class="mb-2">
+				<input id="updatedBy" class="form-control" placeholder="Your name" />
+			</div>
 			<button class="btn btn-success" onclick="saveSpoc()">Save</button>
 			<button class="btn btn-link" onclick="hideForm()">Cancel</button>
 		</div>
@@ -55,13 +69,14 @@
 			list.forEach(s => {
 				const tr = document.createElement('tr');
 				tr.innerHTML = `
-                <td>${s.teamName || ''}</td>
-                <td>${s.spocName || ''}</td>
-                <td>${s.email || ''}</td>
-                <td>${s.contactNumber || ''}</td>
-                <td>${s.backupName || ''}</td>
-                <td>${s.lastUpdatedTime ? new Date(s.lastUpdatedTime).toLocaleString() : ''}</td>
-                <td><button class="btn btn-sm btn-primary" onclick='edit(${s.id})'>Edit</button></td>`;
+        <td>${s.teamName || ''}</td>
+        <td>${s.spocName || ''}</td>
+        <td>${s.email || ''}</td>
+        <td>${s.contactNumber || ''}</td>
+        <td>${s.backupName || ''}</td>
+        <td>${s.lastUpdatedTime ? new Date(s.lastUpdatedTime).toLocaleString() : ''}</td>
+        <td><button class="btn btn-sm btn-primary" onclick='edit(${s.id})'>Edit</button></td>
+      `;
 				tbody.appendChild(tr);
 			});
 		}
@@ -71,8 +86,11 @@
 			document.getElementById('formTitle').innerText = 'Add / Update SPOC';
 			clearForm();
 		}
+
 		function hideForm() {document.getElementById('formArea').style.display = 'none';}
-		function clearForm() {['teamName', 'spocName', 'email', 'contact', 'backup', 'updatedBy'].forEach(id => document.getElementById(id).value = '');}
+		function clearForm() {
+			['teamName', 'spocName', 'email', 'contact', 'backup', 'updatedBy'].forEach(id => document.getElementById(id).value = '');
+		}
 
 		async function saveSpoc() {
 			const payload = {
@@ -84,11 +102,14 @@
 				lastUpdatedBy: document.getElementById('updatedBy').value
 			};
 
-			if (!payload.teamName) {alert('Team name required'); return;}
+			// check if team exists → update else create
+			const team = payload.teamName;
+			if (!team) {alert('Team name required'); return;}
 
-			const getRes = await fetch('/api/spocs/' + encodeURIComponent(payload.teamName));
+			const getRes = await fetch('/api/spocs/' + encodeURIComponent(team));
 			if (getRes.status === 200) {
 				const existing = await getRes.json();
+				// update
 				payload.id = existing.id;
 				await fetch('/api/spocs/' + existing.id, {
 					method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)
@@ -96,11 +117,14 @@
 			} else {
 				await fetch('/api/spocs', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)});
 			}
-			hideForm(); load();
+
+			hideForm();
+			load();
 		}
 
 		async function edit(id) {
-			const list = await (await fetch('/api/spocs')).json();
+			const res = await fetch('/api/spocs');
+			const list = await res.json();
 			const s = list.find(x => x.id === id);
 			if (!s) return;
 			document.getElementById('teamName').value = s.teamName || '';
@@ -113,14 +137,10 @@
 		}
 
 		async function exportCsv() {
-			const list = await (await fetch('/api/spocs')).json();
+			const res = await fetch('/api/spocs');
+			const list = await res.json();
 			const rows = [['Team', 'SPOC', 'Email', 'Contact', 'Backup', 'Last Updated']];
-			list.forEach(s => rows.push([s.teamName || '',
-			s.spocName || '',
-			s.email || '',
-			s.contactNumber || '',
-			s.backupName || '',
-			s.lastUpdatedTime || '']));
+			list.forEach(s => rows.push([s.teamName || '', s.spocName || '', s.email || '', s.contactNumber || '', s.backupName || '', s.lastUpdatedTime || '']));
 			const csv = rows.map(r => r.map(c => '"' + ('' + c).replace(/"/g, '""') + '"').join(',')).join('\n');
 			const blob = new Blob([csv], {type: 'text/csv'});
 			const url = URL.createObjectURL(blob);

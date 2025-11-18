@@ -2,223 +2,257 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="utf-8">
-    <title>CR Dashboard</title>
+	<meta charset="utf-8">
+	<title>CR Dashboard</title>
 
-    <!--<meta name="_csrf" th:content="${_csrf.token}"/>
-    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>-->
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-    <style>
-        body {
-            background: #f1f4f9;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+	<style>
+		body {
+			background: #f1f4f9;
+			font-family: 'Poppins', sans-serif;
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+		}
 
-        .page-title {
-            font-weight: 600;
-            margin-bottom: 15px;
-            letter-spacing: .5px;
-        }
+		.page-title {
+			font-weight: 600;
+			margin-bottom: 15px;
+			letter-spacing: .5px;
+		}
 
-        .card-summary {
-            border-radius: 14px;
-            padding: 18px;
-            min-height: 110px;
-            color: white;
-            cursor: pointer;
-            box-shadow: rgba(0,0,0,0.1) 0 4px 12px;
-            transition: .25s ease;
-            text-align: center;
-        }
+		.card-summary {
+			border-radius: 14px;
+			padding: 18px;
+			min-height: 110px;
+			color: white;
+			cursor: pointer;
+			box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+			transition: .25s ease;
+		}
 
-        .card-summary:hover {
-            transform: translateY(-4px) scale(1.03);
-            box-shadow: rgba(0,0,0,0.18) 0px 8px 22px;
-        }
+		.card-summary:hover {
+			transform: translateY(-4px) scale(1.03);
+			box-shadow: rgba(0, 0, 0, 0.18) 0px 8px 22px;
+		}
 
-        table {
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
+		table {
+			background: white;
+			border-radius: 8px;
+			overflow: hidden;
+		}
 
-        table thead {
-            background: #243763;
-            color: #fff;
-        }
+		table thead {
+			background: #243763;
+			color: #fff;
+		}
 
-        .status-badge {
-            padding: 6px 10px;
-            border-radius: 50px;
-            font-size: .75rem;
-            color: white;
-        }
+		.status-badge {
+			padding: 6px 10px;
+			border-radius: 50px;
+			font-size: .75rem;
+			color: white;
+		}
 
-        .bg-total { background: linear-gradient(135deg,#5865F2,#8A9AFD); }
-        .bg-pending { background: linear-gradient(135deg,#FFB02E,#FF7A00); }
-        .bg-started { background: linear-gradient(135deg,#39C6F3,#1B91C3); }
-        .bg-completed { background: linear-gradient(135deg,#00D27F,#00AF63); }
-        .bg-rejected { background: linear-gradient(135deg,#FF3E54,#D81B42); }
+		/* Gradient header counts */
+		.bg-total {
+			background: linear-gradient(135deg, #5865F2, #8A9AFD);
+		}
 
-        footer {
-            margin-top: auto;
-            padding: 12px;
-            text-align: center;
-            background: #fff;
-            font-size: 14px;
-            border-top: 1px solid #eee;
-            color: #444;
-        }
-    </style>
+		.bg-pending {
+			background: linear-gradient(135deg, #FFB02E, #FF7A00);
+		}
+
+		.bg-started {
+			background: linear-gradient(135deg, #39C6F3, #1B91C3);
+		}
+
+		.bg-completed {
+			background: linear-gradient(135deg, #00D27F, #00AF63);
+		}
+
+		.bg-rejected {
+			background: linear-gradient(135deg, #FF3E54, #D81B42);
+		}
+
+		footer {
+			margin-top: auto;
+			padding: 12px;
+			text-align: center;
+			background: #fff;
+			font-size: 14px;
+			border-top: 1px solid #eee;
+			color: #444;
+		}
+	</style>
 </head>
 
 <body>
 
-<div th:replace="~{fragments/navbar :: fragment}"></div>
+	<div th:replace="~{fragments/navbar :: fragment}"></div>
 
-<div class="container mt-4">
-    <h3 class="page-title"><i class="fa-solid fa-chart-line"></i> CR Dashboard</h3>
+	<div class="container mt-4">
+		<h3 class="page-title">
+			<i class="fa-solid fa-chart-line"></i> CR Dashboard
+		</h3>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-2">
-            <div class="card-summary bg-total" onclick="applyFilter('')">
-                <h6>Total CRs</h6>
-                <h2 th:text="${totalCount}"></h2>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card-summary bg-pending" onclick="applyFilter('PENDING')">
-                <h6>Pending</h6>
-                <h2 th:text="${pendingCount}"></h2>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card-summary bg-started" onclick="applyFilter('STARTED')">
-                <h6>Started</h6>
-                <h2 th:text="${startedCount}"></h2>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card-summary bg-completed" onclick="applyFilter('COMPLETED')">
-                <h6>Completed</h6>
-                <h2 th:text="${completedCount}"></h2>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card-summary bg-rejected" onclick="applyFilter('REJECTED')">
-                <h6>Rejected</h6>
-                <h2 th:text="${rejectedCount}"></h2>
-            </div>
-        </div>
-    </div>
+		<div class="row g-3 mb-4">
 
-    <!-- TABLE -->
-    <table class="table table-hover table-striped">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>CR Number</th>
-            <th>Name</th>
-            <th>Date</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>Created By</th>
-            <th>Pending SPOC</th>
-            <th>Status</th>
-            <th th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Action</th>
-            <th>View</th>
-        </tr>
-        </thead>
+			<div class="col-md-2">
+				<div class="card-summary bg-total text-center" onclick="applyFilter('')">
+					<h6>Total CRs</h6>
+					<h2 th:text="${totalCount}"></h2>
+				</div>
+			</div>
 
-        <tbody>
-        <tr th:each="a,iter : ${activities}">
-            <td th:text="${iter.index + 1 + (page.number * page.size)}"></td>
-            <td th:text="${a.crNumber}"></td>
-            <td th:text="${a.name}"></td>
-            <td th:text="${a.implementationDate}"></td>
-            <td th:text="${a.startTime}"></td>
-            <td th:text="${a.endTime}"></td>
-            <td th:text="${a.createdBy}"></td>
-            <td><span th:text="${#lists.size(a.assignments.?[status.name() == 'PENDING'])}">0</span></td>
-            <td>
-                <span class="status-badge"
-                      th:classappend="${a.activityStatus.name()=='PENDING'?' bg-warning':
-                                       a.activityStatus.name()=='STARTED'?' bg-info':
-                                       a.activityStatus.name()=='COMPLETED'?' bg-success':' bg-danger'}"
-                      th:text="${a.activityStatus.name()}"></span>
-            </td>
-            <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                <select class="form-select form-select-sm" th:id="'st_' + ${a.id}">
-                    <option>PENDING</option>
-                    <option>STARTED</option>
-                    <option>COMPLETED</option>
-                    <option>REJECTED</option>
-                </select>
-                <button class="btn btn-sm btn-primary mt-1" th:attr="data-id=${a.id}" onclick="saveStatus(this.dataset.id)">Save</button>
-            </td>
-            <td><a th:href="@{/activities/{id}(id=${a.id})}" class="btn btn-sm btn-dark">View</a></td>
-        </tr>
-        </tbody>
-    </table>
+			<div class="col-md-2">
+				<div class="card-summary bg-pending text-center" onclick="applyFilter('PENDING')">
+					<h6>Pending</h6>
+					<h2 th:text="${pendingCount}"></h2>
+				</div>
+			</div>
 
-    <!-- PAGINATION -->
-    <nav>
-        <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${page.first}?'disabled'">
-                <a class="page-link" th:href="@{/dashboard(page=${page.number-1},filter=${filter})}">Prev</a>
-            </li>
-            <li th:each="i : ${#numbers.sequence(0, page.totalPages-1)}" class="page-item" th:classappend="${page.number==i}?'active'">
-                <a class="page-link" th:text="${i+1}" th:href="@{/dashboard(page=${i},filter=${filter})}"></a>
-            </li>
-            <li class="page-item" th:classappend="${page.last}?'disabled'">
-                <a class="page-link" th:href="@{/dashboard(page=${page.number+1},filter=${filter})}">Next</a>
-            </li>
-        </ul>
-    </nav>
-</div>
+			<div class="col-md-2">
+				<div class="card-summary bg-started text-center" onclick="applyFilter('STARTED')">
+					<h6>Started</h6>
+					<h2 th:text="${startedCount}"></h2>
+				</div>
+			</div>
 
-<footer>
-    © 2025 @TKS. All rights reserved |
-    <a href="#">Privacy</a> |
-    <a href="#">Terms</a> |
-    <a href="#">Contact</a>
-</footer>
+			<div class="col-md-2">
+				<div class="card-summary bg-completed text-center" onclick="applyFilter('COMPLETED')">
+					<h6>Completed</h6>
+					<h2 th:text="${completedCount}"></h2>
+				</div>
+			</div>
 
-<script>
-    function applyFilter(f){
-        window.location = "/dashboard?filter="+f;
-    }
+			<div class="col-md-2">
+				<div class="card-summary bg-rejected text-center" onclick="applyFilter('REJECTED')">
+					<h6>Rejected</h6>
+					<h2 th:text="${rejectedCount}"></h2>
+				</div>
+			</div>
+		</div>
 
-    const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
-    const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
+		<!-- TABLE -->
+		<table class="table table-hover table-striped">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>CR Number</th>
+					<th>Name</th>
+					<th>Date</th>
+					<th>Start Time</th>
+					<th>End Time</th>
+					<th>Created By</th>
+					<th>Pending SPOC</th>
+					<th>Status</th>
+					<th th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Action</th>
+					<th>View</th>
+				</tr>
+			</thead>
 
-    async function saveStatus(id){
-        const sel = document.getElementById("st_" + id);
-        const status = sel.value;
+			<tbody>
+				<tr th:each="a,iter : ${activities}">
+					<td th:text="${iter.index + 1 + (page.number * page.size)}"></td>
+					<td th:text="${a.crNumber}"></td>
+					<td th:text="${a.name}"></td>
+					<td th:text="${a.implementationDate}"></td>
+					<td th:text="${a.startTime}"></td>
+					<td th:text="${a.endTime}"></td>
+					<td th:text="${a.createdBy}"></td>
 
-        const headers = {"Content-Type": "application/json"};
-        if(csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
+					<td><span th:text="${#lists.size(a.assignments.?[status.name() == 'PENDING'])}">0</span></td>
 
-        const res = await fetch('/api/activities/' + id + '/status', {
-            method:'PUT',
-            headers,
-            body:JSON.stringify({status})
-        });
+					<td>
+						<span class="status-badge" th:classappend="${a.activityStatus.name()=='PENDING'?' bg-warning':
+                                      a.activityStatus.name()=='STARTED'?' bg-info':
+                                      a.activityStatus.name()=='COMPLETED'?' bg-success':' bg-danger'}"
+							th:text="${a.activityStatus.name()}"></span>
+					</td>
 
-        if(res.ok){
-            alert("Updated!");
-            setTimeout(()=>location.reload(),600);
-        } else {
-            alert("Error: "+await res.text());
-        }
-    }
-</script>
+					<td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+						<select class="form-select form-select-sm" th:id="'st_' + ${a.id}">
+							<option>PENDING</option>
+							<option>STARTED</option>
+							<option>COMPLETED</option>
+							<option>REJECTED</option>
+						</select>
+						<button class="btn btn-sm btn-primary mt-1" th:attr="data-id=${a.id}"
+							onclick="saveStatus(this.dataset.id)">Save</button>
+					</td>
+
+					<td><a th:href="@{/activities/{id}(id=${a.id})}" class="btn btn-sm btn-dark">View</a></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<!-- PAGINATION -->
+		<nav>
+			<ul class="pagination justify-content-center">
+				<li class="page-item" th:classappend="${page.first}?'disabled'">
+					<a class="page-link" th:href="@{/dashboard(page=${page.number-1},filter=${filter})}">Prev</a>
+				</li>
+
+				<li th:each="i : ${#numbers.sequence(0, page.totalPages-1)}" class="page-item"
+					th:classappend="${page.number==i}?'active'">
+					<a class="page-link" th:text="${i+1}" th:href="@{/dashboard(page=${i},filter=${filter})}"></a>
+				</li>
+
+				<li class="page-item" th:classappend="${page.last}?'disabled'">
+					<a class="page-link" th:href="@{/dashboard(page=${page.number+1},filter=${filter})}">Next</a>
+				</li>
+			</ul>
+		</nav>
+
+	</div>
+
+	<footer>
+		© 2025 @TKS. All rights reserved |
+		<a href="#">Privacy</a> |
+		<a href="#">Terms</a> |
+		<a href="#">Contact</a>
+	</footer>
+
+	<script>
+		function applyFilter(f) {
+			window.location = "/dashboard?filter=" + f;
+		}
+
+		function crossesMidnight(start, end) {
+			return end < start; // e.g. 23:00 > 03:00
+		}
+
+		const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+		const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+		async function saveStatus(id) {
+			const sel = document.getElementById("st_" + id);
+			const status = sel.value;
+
+			const headers = {"Content-Type": "application/json"};
+			headers[csrfHeader] = csrfToken;
+
+			const res = await fetch('/api/activities/' + id + '/status', {
+				method: 'PUT',
+				headers,
+				body: JSON.stringify({status})
+			});
+
+			if (res.ok) {
+				alert("Updated!");
+				setTimeout(() => location.reload(), 600);
+			} else {
+				alert("Error: " + await res.text());
+			}
+		}
+	</script>
 
 </body>
+
 </html>
