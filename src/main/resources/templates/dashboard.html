@@ -34,6 +34,7 @@
             cursor: pointer;
             box-shadow: rgba(0,0,0,0.1) 0 4px 12px;
             transition: .25s ease;
+            text-align: center;
         }
 
         .card-summary:hover {
@@ -59,7 +60,6 @@
             color: white;
         }
 
-        /* Gradient header counts */
         .bg-total { background: linear-gradient(135deg,#5865F2,#8A9AFD); }
         .bg-pending { background: linear-gradient(135deg,#FFB02E,#FF7A00); }
         .bg-started { background: linear-gradient(135deg,#39C6F3,#1B91C3); }
@@ -83,42 +83,35 @@
 <div th:replace="~{fragments/navbar :: fragment}"></div>
 
 <div class="container mt-4">
-    <h3 class="page-title">
-        <i class="fa-solid fa-chart-line"></i> CR Dashboard
-    </h3>
+    <h3 class="page-title"><i class="fa-solid fa-chart-line"></i> CR Dashboard</h3>
 
     <div class="row g-3 mb-4">
-
         <div class="col-md-2">
-            <div class="card-summary bg-total text-center" onclick="applyFilter('')">
+            <div class="card-summary bg-total" onclick="applyFilter('')">
                 <h6>Total CRs</h6>
                 <h2 th:text="${totalCount}"></h2>
             </div>
         </div>
-
         <div class="col-md-2">
-            <div class="card-summary bg-pending text-center" onclick="applyFilter('PENDING')">
+            <div class="card-summary bg-pending" onclick="applyFilter('PENDING')">
                 <h6>Pending</h6>
                 <h2 th:text="${pendingCount}"></h2>
             </div>
         </div>
-
         <div class="col-md-2">
-            <div class="card-summary bg-started text-center" onclick="applyFilter('STARTED')">
+            <div class="card-summary bg-started" onclick="applyFilter('STARTED')">
                 <h6>Started</h6>
                 <h2 th:text="${startedCount}"></h2>
             </div>
         </div>
-
         <div class="col-md-2">
-            <div class="card-summary bg-completed text-center" onclick="applyFilter('COMPLETED')">
+            <div class="card-summary bg-completed" onclick="applyFilter('COMPLETED')">
                 <h6>Completed</h6>
                 <h2 th:text="${completedCount}"></h2>
             </div>
         </div>
-
         <div class="col-md-2">
-            <div class="card-summary bg-rejected text-center" onclick="applyFilter('REJECTED')">
+            <div class="card-summary bg-rejected" onclick="applyFilter('REJECTED')">
                 <h6>Rejected</h6>
                 <h2 th:text="${rejectedCount}"></h2>
             </div>
@@ -133,8 +126,8 @@
             <th>CR Number</th>
             <th>Name</th>
             <th>Date</th>
-			<th>Start Time</th>
-			<th>End Time</th>
+            <th>Start Time</th>
+            <th>End Time</th>
             <th>Created By</th>
             <th>Pending SPOC</th>
             <th>Status</th>
@@ -149,20 +142,17 @@
             <td th:text="${a.crNumber}"></td>
             <td th:text="${a.name}"></td>
             <td th:text="${a.implementationDate}"></td>
-			<td th:text="${a.startTime}"></td>
-			<td th:text="${a.endTime}"></td>
+            <td th:text="${a.startTime}"></td>
+            <td th:text="${a.endTime}"></td>
             <td th:text="${a.createdBy}"></td>
-
             <td><span th:text="${#lists.size(a.assignments.?[status.name() == 'PENDING'])}">0</span></td>
-
             <td>
                 <span class="status-badge"
                       th:classappend="${a.activityStatus.name()=='PENDING'?' bg-warning':
-                                      a.activityStatus.name()=='STARTED'?' bg-info':
-                                      a.activityStatus.name()=='COMPLETED'?' bg-success':' bg-danger'}"
+                                       a.activityStatus.name()=='STARTED'?' bg-info':
+                                       a.activityStatus.name()=='COMPLETED'?' bg-success':' bg-danger'}"
                       th:text="${a.activityStatus.name()}"></span>
             </td>
-
             <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
                 <select class="form-select form-select-sm" th:id="'st_' + ${a.id}">
                     <option>PENDING</option>
@@ -172,7 +162,6 @@
                 </select>
                 <button class="btn btn-sm btn-primary mt-1" th:attr="data-id=${a.id}" onclick="saveStatus(this.dataset.id)">Save</button>
             </td>
-
             <td><a th:href="@{/activities/{id}(id=${a.id})}" class="btn btn-sm btn-dark">View</a></td>
         </tr>
         </tbody>
@@ -184,19 +173,14 @@
             <li class="page-item" th:classappend="${page.first}?'disabled'">
                 <a class="page-link" th:href="@{/dashboard(page=${page.number-1},filter=${filter})}">Prev</a>
             </li>
-
-            <li th:each="i : ${#numbers.sequence(0, page.totalPages-1)}"
-                class="page-item" th:classappend="${page.number==i}?'active'">
-                <a class="page-link" th:text="${i+1}"
-                   th:href="@{/dashboard(page=${i},filter=${filter})}"></a>
+            <li th:each="i : ${#numbers.sequence(0, page.totalPages-1)}" class="page-item" th:classappend="${page.number==i}?'active'">
+                <a class="page-link" th:text="${i+1}" th:href="@{/dashboard(page=${i},filter=${filter})}"></a>
             </li>
-
             <li class="page-item" th:classappend="${page.last}?'disabled'">
                 <a class="page-link" th:href="@{/dashboard(page=${page.number+1},filter=${filter})}">Next</a>
             </li>
         </ul>
     </nav>
-
 </div>
 
 <footer>
@@ -210,20 +194,16 @@
     function applyFilter(f){
         window.location = "/dashboard?filter="+f;
     }
-	
-	function crossesMidnight(start, end) {
-				return end < start; // e.g. 23:00 > 03:00
-			}
 
-    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
-    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+    const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
 
     async function saveStatus(id){
         const sel = document.getElementById("st_" + id);
         const status = sel.value;
 
         const headers = {"Content-Type": "application/json"};
-        headers[csrfHeader] = csrfToken;
+        if(csrfToken && csrfHeader) headers[csrfHeader] = csrfToken;
 
         const res = await fetch('/api/activities/' + id + '/status', {
             method:'PUT',

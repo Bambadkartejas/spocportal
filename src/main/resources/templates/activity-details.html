@@ -1,16 +1,28 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 
 <head>
 	<meta charset="UTF-8" />
 	<title>CR SPOC Assignment</title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-	<!--<meta name="_csrf" th:content="${_csrf.token}" />
-	<meta name="_csrf_header" th:content="${_csrf.headerName}" />-->
+
+	<meta name="_csrf" th:content="${_csrf.token}" />
+	<meta name="_csrf_header" th:content="${_csrf.headerName}" />
+
+	<style>
+		body {
+			font-family: 'Poppins', sans-serif;
+			background: #f6f7fb;
+		}
+
+		.table input {
+			width: 100%;
+		}
+	</style>
 </head>
 
 <body>
-
+	<!-- Navbar -->
 	<div th:replace="~{fragments/navbar :: fragment}"></div>
 
 	<div class="container mt-3">
@@ -18,19 +30,21 @@
 		<a href="/dashboard" class="btn btn-link">&lt; Back</a>
 
 		<h3 th:text="${activity.crNumber + ' - ' + activity.name}"></h3>
+
 		<p>
 			Implementation Date: <span th:text="${activity.implementationDate}"></span> |
 			Start Time: <span th:text="${activity.startTime}"></span> |
 			End Time: <span th:text="${activity.endTime}"></span> |
-			Created By: <span th:text="${activity.createdBy}"></span> 
+			Created By: <span th:text="${activity.createdBy}"></span>
 		</p>
+
 		<p>
 			CR Description:
 			<span th:text="${activity.crDescription != null ? activity.crDescription :
-		                    (activity.description != null ? activity.description : '--- No Description ---')}"></span>
+                            (activity.description != null ? activity.description : '--- No Description ---')}"></span>
 		</p>
 
-
+		<!-- Assignments Table -->
 		<table class="table table-bordered table-striped">
 			<thead>
 				<tr>
@@ -57,14 +71,12 @@
 					</td>
 					<td><input class="form-control" th:id="'pcontact_'+${as.id}"
 							th:value="${as.displayPrimaryContact}" /></td>
-
 					<td><input class="form-control" th:id="'sname_'+${as.id}" th:value="${as.displaySecondaryName}" />
 					</td>
 					<td><input class="form-control" th:id="'semail_'+${as.id}" th:value="${as.displaySecondaryEmail}" />
 					</td>
 					<td><input class="form-control" th:id="'scontact_'+${as.id}"
 							th:value="${as.displaySecondaryContact}" /></td>
-
 					<td><input class="form-control" th:id="'c_'+${as.id}" th:value="${as.comments}" /></td>
 
 					<td>
@@ -77,18 +89,18 @@
 					</td>
 
 					<td>
-						<button class="btn btn-sm btn-success" th:data-id="${as.id}"
-							onclick="save(this.dataset.id)">Save</button>
+						<button class="btn btn-sm btn-success" th:data-id="${as.id}" onclick="save(this.dataset.id)">
+							Save
+						</button>
 					</td>
 				</tr>
 			</tbody>
 		</table>
-
 	</div>
 
 	<script>
-		const csrfToken = document.querySelector('meta[name=_csrf]').content;
-		const csrfHeader = document.querySelector('meta[name=_csrf_header]').content;
+		const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+		const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
 
 		async function save(id) {
 			const payload = {
@@ -102,23 +114,29 @@
 				status: document.getElementById("st_" + id)?.value
 			};
 
-			const res = await fetch("/api/assignments/" + id, {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					[csrfHeader]: csrfToken
-				},
-				body: JSON.stringify(payload)
-			});
+			try {
+				const res = await fetch("/api/assignments/" + id, {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+						[csrfHeader]: csrfToken
+					},
+					body: JSON.stringify(payload),
+					credentials: "same-origin"
+				});
 
-			if (res.ok) {
-				location.reload();
-			} else {
-				alert("Save failed " + res.status);
+				if (res.ok) {
+					alert("Saved successfully!");
+					location.reload();
+				} else {
+					const errMsg = await res.text();
+					alert("Save failed: " + errMsg);
+				}
+			} catch (e) {
+				alert("Error: " + e.message);
 			}
 		}
 	</script>
-
 </body>
 
 </html>

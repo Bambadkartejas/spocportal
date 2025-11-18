@@ -112,14 +112,13 @@
 			font-size: 14px;
 		}
 
-		/* ❤️ Credential Box */
 		.cred-box {
-			background: rgba(255,255,255,0.12);
+			background: rgba(255, 255, 255, 0.12);
 			color: #fff;
 			margin-top: 25px;
 			padding: 15px;
 			border-radius: 8px;
-			border: 1px solid rgba(255,255,255,0.25);
+			border: 1px solid rgba(255, 255, 255, 0.25);
 			font-size: 14px;
 		}
 
@@ -131,7 +130,7 @@
 		.cred-item {
 			margin-bottom: 8px;
 			padding: 8px;
-			background: rgba(255,255,255,0.1);
+			background: rgba(255, 255, 255, 0.1);
 			border-radius: 6px;
 		}
 
@@ -167,10 +166,8 @@
 
 		<h3>SPOC Portal Login</h3>
 
-		<!-- 🔴 Login Error -->
-		<div th:if="${param.error}" class="alert">
-			Invalid username or password!
-		</div>
+		<!-- Login Error -->
+		<div th:if="${param.error}" class="alert">Invalid username or password!</div>
 
 		<label for="username">Username</label>
 		<input type="text" name="username" id="username" placeholder="Enter Username" required>
@@ -180,27 +177,16 @@
 
 		<button type="submit">Login</button>
 
-		<!-- ⭐ Default Credentials Box -->
+		<!-- Default Credentials Box -->
 		<div class="cred-box">
 			<h4>🔐 Default Login Credentials</h4>
-
-			<div class="cred-item">
-				<span>Admin ID:</span> admin / Admin@2714
-			</div>
-
-			<div class="cred-item">
-				<span>User ID:</span> user / User@2714
-			</div>
+			<div class="cred-item"><span>Admin ID:</span> admin / Admin@2714</div>
+			<div class="cred-item"><span>User ID:</span> user / User@2714</div>
 		</div>
-
 	</form>
 
-	<footer>
-		© 2025 @TKS | All rights reserved.
-		<!--<a href="#">Privacy Policy</a> |
-		<a href="#">Terms</a> |
-		<a href="#">Contact Us</a>-->
-	</footer>
+	<footer>© 2025 @TKS | All rights reserved.</footer>
 
 </body>
+
 </html>
