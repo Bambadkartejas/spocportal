@@ -59,6 +59,7 @@ public class SecurityConfig {
 				.csrf(csrf -> csrf.disable()).headers(headers -> headers.frameOptions().disable());
 
 		return http.build();
+
 	}
 
 }
