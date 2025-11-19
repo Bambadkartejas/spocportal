@@ -18,14 +18,14 @@ public class ActivityService {
 	private final ActivityRepository activityRepository;
 	private final SpocRepository spocRepository;
 	private final ActivityAssignmentRepository assignmentRepository;
-	private final EmailService emailService;
+//	private final EmailService emailService;
 
 	public ActivityService(ActivityRepository activityRepository, SpocRepository spocRepository,
-			ActivityAssignmentRepository assignmentRepository, EmailService emailService) {
+			ActivityAssignmentRepository assignmentRepository){//, EmailService emailService) {
 		this.activityRepository = activityRepository;
 		this.spocRepository = spocRepository;
 		this.assignmentRepository = assignmentRepository;
-		this.emailService = emailService;
+//		this.emailService = emailService;
 	}
 
 	public List<Activity> listAll() {
@@ -55,9 +55,9 @@ public class ActivityService {
 		}
 
 		// send initial notification to provided groupEmails
-		if (groupEmails != null && groupEmails.length > 0) {
-			emailService.sendNotificationForNewActivity(saved, groupEmails);
-		}
+//		if (groupEmails != null && groupEmails.length > 0) {
+//			emailService.sendNotificationForNewActivity(saved, groupEmails);
+//		}
 		return saved;
 	}
 

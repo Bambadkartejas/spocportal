@@ -113,14 +113,19 @@ public class ActivityController {
 	private JavaMailSender mailSender;
 
 	@GetMapping("/test-mail")
+	@ResponseBody
 	public String sendTestMail() {
-	    SimpleMailMessage msg = new SimpleMailMessage();
-	    msg.setTo("tejasbmabadkar@gmail.com");
-	    msg.setSubject("Test Mail");
-	    msg.setText("Hello! This is a Spring Boot local test email.");
-
-	    mailSender.send(msg);
-	    return "Mail Sent!";
+	    try {
+	        SimpleMailMessage msg = new SimpleMailMessage();
+	        msg.setTo("tejasbmabadkar@gmail.com");
+	        msg.setSubject("Test Mail");
+	        msg.setText("Hello! This is a Spring Boot local test email.");
+	        mailSender.send(msg);
+	        return "Mail Sent Successfully!";
+	    } catch (Exception ex) {
+	        ex.printStackTrace();
+	        return "Error: " + ex.getMessage();
+	    }
 	}
 
 
