@@ -1,41 +1,100 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="utf-8">
-    <title>Escalation SPOC Contact</title>
-    <meta name="_csrf" th:content="${_csrf.token}">
-    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <title>Escalation SPOC</title>
+
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- CSRF meta tags -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
     <style>
-        body { background: #f6f7fb; font-family: "Poppins", sans-serif; }
-        h3 { font-weight: 600; color: #0d6efd; }
-        .table-card { background: #fff; border-radius: 12px; border: 1px solid #eee; box-shadow: 0 4px 14px rgba(0,0,0,0.06); overflow: hidden; }
-        .table-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
-        thead { background: #0d6efd; color: #fff; font-size: 14px; }
-        tbody tr:hover { background: #e9f2ff; }
-        #editArea { background: #fff; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ddd; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
-        label { font-weight: 500; }
-        input:focus { border-color: #0d6efd !important; box-shadow: rgba(13,110,253,0.25) 0 0 0 4px !important; }
-        .btn-primary { padding: 3px 10px; }
-        .badge-team { background: #0d6efd; padding: 5px 12px; border-radius: 8px; color: #fff; font-size: .8rem; }
-        /* Responsive table scroll */
-        .table-responsive { overflow-x: auto; }
+        body {
+            background: #f8f9fa;
+            font-family: "Poppins", sans-serif;
+        }
+
+        h3.page-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #0d6efd;
+        }
+
+        .table-wrapper {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            overflow-x: auto; /* horizontal scroll on small screens */
+        }
+
+        table thead {
+            background: #0d6efd;
+            color: white;
+        }
+
+        table tbody tr:hover {
+            background: #f1f7ff;
+        }
+
+        #editArea {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .05);
+        }
+
+        label {
+            font-weight: 500;
+        }
+
+        input:focus {
+            border-color: #0d6efd !important;
+            box-shadow: rgba(13, 110, 253, .25) 0px 0px 0px 4px !important;
+        }
+
+        .btn-primary, .btn-success {
+            padding: 3px 10px;
+        }
+
+        .badge-team {
+            background: #0d6efd;
+            padding: 5px 12px;
+            border-radius: 8px;
+            color: white;
+            font-size: .8rem;
+        }
+
+        @media (max-width: 768px) {
+            .page-title {
+                font-size: 18px;
+            }
+            #editArea {
+                padding: 15px;
+            }
+        }
     </style>
 </head>
+
 <body>
 
     <!-- Navbar -->
     <div th:replace="fragments/navbar :: fragment"></div>
 
     <div class="container mt-4">
-        <h3>Escalation POC</h3>
 
-        <div class="table-card mt-3 table-responsive">
-            <table class="table table-bordered table-striped m-0">
+        <h3 class="page-title">Escalation POC</h3>
+
+        <div class="table-wrapper">
+            <table class="table table-hover table-bordered align-middle">
                 <thead>
                     <tr>
                         <th>Team</th>
@@ -55,36 +114,45 @@
         <!-- Edit SPOC Panel -->
         <div id="editArea" style="display:none;">
             <h5 class="text-success">✏️ Edit SPOC Details</h5>
+
             <input id="spocId" type="hidden" />
+
             <div class="row mt-3">
                 <div class="col-md-6 mb-2">
                     <label>Your Name</label>
                     <input id="lastUpdatedBy" class="form-control" placeholder="Updated by" />
                 </div>
+
                 <div class="col-md-6 mb-2">
                     <label>Primary Name</label>
                     <input id="primaryName" class="form-control" />
                 </div>
+
                 <div class="col-md-6 mb-2">
                     <label>Primary Email</label>
                     <input id="primaryEmail" class="form-control" />
                 </div>
+
                 <div class="col-md-6 mb-2">
                     <label>Primary Contact</label>
                     <input id="primaryContact" class="form-control" />
                 </div>
+
                 <div class="col-md-6 mb-2">
                     <label>Secondary Name</label>
                     <input id="secondaryName" class="form-control" />
                 </div>
+
                 <div class="col-md-6 mb-2">
                     <label>Secondary Email</label>
                     <input id="secondaryEmail" class="form-control" />
                 </div>
+
                 <div class="col-md-6 mb-2">
                     <label>Secondary Contact</label>
                     <input id="secondaryContact" class="form-control" />
                 </div>
+
                 <div class="col-12 mt-2">
                     <button class="btn btn-success" onclick="saveSpoc()">💾 Save</button>
                     <button class="btn btn-outline-secondary btn-sm" onclick="closeEdit()">Cancel</button>
@@ -93,9 +161,6 @@
         </div>
 
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         const csrfToken = document.querySelector('meta[name="_csrf"]').content;
@@ -106,6 +171,7 @@
             const list = await res.json();
             const tbody = document.getElementById('tbody');
             tbody.innerHTML = '';
+
             list.forEach(s => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -124,6 +190,7 @@
         function edit(id) {
             fetch('/api/spocs').then(r => r.json()).then(list => {
                 const s = list.find(x => x.id === id);
+
                 document.getElementById('spocId').value = s.id;
                 document.getElementById('primaryName').value = s.primaryName || '';
                 document.getElementById('primaryEmail').value = s.primaryEmail || '';
@@ -132,15 +199,19 @@
                 document.getElementById('secondaryEmail').value = s.secondaryEmail || '';
                 document.getElementById('secondaryContact').value = s.secondaryContact || '';
                 document.getElementById('lastUpdatedBy').value = "";
+
                 document.getElementById('editArea').style.display = 'block';
                 window.scrollTo(0, document.body.scrollHeight);
             });
         }
 
-        function closeEdit() { document.getElementById('editArea').style.display = 'none'; }
+        function closeEdit() {
+            document.getElementById('editArea').style.display = 'none';
+        }
 
         async function saveSpoc() {
             const id = document.getElementById('spocId').value;
+
             const payload = {
                 primaryName: document.getElementById('primaryName').value,
                 primaryEmail: document.getElementById('primaryEmail').value,
@@ -150,16 +221,27 @@
                 secondaryContact: document.getElementById('secondaryContact').value,
                 lastUpdatedBy: document.getElementById('lastUpdatedBy').value || 'Unknown'
             };
+
             const res = await fetch('/api/spocs/' + id, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', [csrfHeader]: csrfToken },
                 body: JSON.stringify(payload),
                 credentials: 'same-origin'
             });
-            if (res.ok) { closeEdit(); load(); } else { alert('Save failed: ' + res.status); }
+
+            if (res.ok) {
+                closeEdit();
+                load();
+            } else {
+                alert('Save failed: ' + res.status);
+            }
         }
 
         window.onload = load;
     </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
