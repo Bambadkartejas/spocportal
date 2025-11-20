@@ -54,50 +54,123 @@
 
 <body>
 
-<!-- Navbar Fragment -->
-<div th:fragment="navbar">
+<!-- src/main/resources/templates/fragments/navbar.html -->
+<div th:fragment="fragment">
 
-    <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container-fluid">
+  <style>
+    .navbar-custom {
+      background: #1f1f1f;
+      border-bottom: 2px solid #444;
+    }
 
-            <!-- Brand -->
-            <a class="navbar-brand brand-title" href="/dashboard">SPOC Portal</a>
+    .nav-link {
+      color: #fff !important;
+      font-weight: 500;
+      margin-right: 15px;
+    }
 
-            <!-- Hamburger button -->
-            <button class="navbar-toggler" type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navMenu"
-                    aria-controls="navMenu"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+    .nav-link:hover { color: #0d6efd !important; transition: 0.2s; }
+    .brand-title { font-size: 20px; font-weight: 600; color: #0d6efd; }
+    .logout-btn { color: #ffbaba !important; font-weight: 500; }
+    .logout-btn:hover { color: red !important; }
 
-            <!-- Collapsible menu -->
-            <div class="collapse navbar-collapse" id="navMenu">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/activities">Activities</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/spocs">Escalation POC</a></li>
-                    <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
-                        <a class="nav-link" href="/admin/activities/create">Create CR</a>
-                    </li>
-                </ul>
+    /* Make the default toggler icon visible on dark background (keeps original look) */
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(255,255,255,1)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+      width: 24px;
+      height: 24px;
+      background-size: 24px 24px;
+    }
 
-                <!-- Logout button -->
-                <form th:action="@{/logout}" method="post" class="d-inline">
-                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <button type="submit" class="btn btn-link logout-btn">Logout</button>
-                </form>
-            </div>
+    /* ensure navbar is on top so clicks reach the toggler */
+    nav.navbar { position: relative; z-index: 3000; }
+  </style>
 
-        </div>
-    </nav>
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+
+      <!-- Brand -->
+      <a class="navbar-brand brand-title" href="/dashboard">SPOC Portal</a>
+
+      <!-- Toggler: id added for reliable JS hookup; attributes kept for Bootstrap compatibility -->
+      <button id="spoc-toggler" class="navbar-toggler" type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarContent"
+              aria-controls="navbarContent"
+              aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Collapsible menu (class names unchanged) -->
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="/activities">Activities</a></li>
+          <li class="nav-item"><a class="nav-link" href="/spocs">Esclation POC</a></li>
+          <li class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+            <a class="nav-link" href="/admin/activities/create">Create CR</a>
+          </li>
+        </ul>
+
+        <form th:action="@{/logout}" method="post" class="d-inline">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="btn btn-link logout-btn">Logout</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+
+  <!--
+    Reliable toggle script:
+    - If Bootstrap's Collapse API exists, it will use it.
+    - Otherwise it will toggle the 'show' class manually (works every time).
+    - This avoids changing other files and fixes issues caused by duplicate/blocked bootstrap scripts.
+  -->
+  <script>
+    (function () {
+      var toggler = document.getElementById('spoc-toggler');
+      var collapseEl = document.getElementById('navbarContent');
+      if (!toggler || !collapseEl) return;
+
+      toggler.addEventListener('click', function (ev) {
+        // Try to use Bootstrap Collapse if available
+        if (window.bootstrap && window.bootstrap.Collapse) {
+          try {
+            var inst = window.bootstrap.Collapse.getInstance(collapseEl);
+            if (!inst) inst = new window.bootstrap.Collapse(collapseEl, { toggle: false });
+            inst.toggle();
+            return;
+          } catch (e) {
+            // fallback to manual toggle below
+          }
+        }
+
+        // Manual fallback toggle (always works)
+        if (collapseEl.classList.contains('show')) {
+          collapseEl.classList.remove('show');
+          toggler.setAttribute('aria-expanded', 'false');
+        } else {
+          collapseEl.classList.add('show');
+          toggler.setAttribute('aria-expanded', 'true');
+        }
+      });
+
+      // Defensive: ensure clicks aren't blocked by overlaid element
+      setTimeout(function () {
+        var rect = toggler.getBoundingClientRect();
+        var el = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        if (el && !toggler.contains(el) && el !== toggler) {
+          // if some overlay element sits above toggler, give a console warning for debugging
+          try {
+            console.warn('[NAVBAR] element over toggler:', el.tagName, el.id || el.className);
+          } catch (e) {}
+        }
+      }, 200);
+    })();
+  </script>
 
 </div>
-
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
