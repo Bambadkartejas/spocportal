@@ -170,7 +170,7 @@
 		const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
 
 		async function load() {
-			const res = await fetch('/api/spocs');
+			const res = await fetch('/spocs');
 			const list = await res.json();
 			const tbody = document.getElementById('tbody');
 			tbody.innerHTML = '';
