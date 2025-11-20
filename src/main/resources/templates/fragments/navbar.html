@@ -66,6 +66,7 @@
 </head>
 
 <body>
+    <div th:fragment="fragment">
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container-fluid">
             <!-- Brand -->
@@ -97,8 +98,30 @@
         </div>
     </nav>
 
-    <!-- Bootstrap JS bundle (includes Popper) -->
+    <style>
+        .navbar-custom { background-color: #1f1f1f; border-bottom: 2px solid #444; }
+        .brand-title { font-size: 20px; font-weight: 600; color: #0d6efd; }
+        .nav-link { color: #fff !important; font-weight: 500; margin-right: 8px; white-space: nowrap; }
+        .nav-link:hover { color: #0d6efd !important; transition: 0.2s; }
+        .logout-btn { color: #ffbaba !important; font-weight: 500; }
+        .logout-btn:hover { color: red !important; }
+        .navbar-toggler { border: none; }
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba(255,255,255,1)' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+        }
+        @media (max-width: 576px) {
+            .brand-title { font-size: 18px; }
+            .navbar-nav { flex-wrap: wrap; }
+        }
+    </style>
+
+    <!-- Bootstrap JS (if not already in page) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+
+
+
+    
 </body>
 
 </html>
